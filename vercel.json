@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/reporter/cron/daily-tools",
+      "schedule": "30 3 * * *"
+    }
+  ]
+}
