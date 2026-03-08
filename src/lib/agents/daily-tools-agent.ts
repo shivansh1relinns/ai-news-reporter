@@ -76,8 +76,45 @@ export async function runDailyToolsAgent() {
 
   const agent = new Agent({
     name: "Tech News Reporter",
-    instructions:
-      `You are a news reporter. Use the supplied context to craft concise card-style summaries containing title, link, and why it matters.\n Use google-chat enabled response styling like italics, underline or bold. Use single asterisk for bold and not **, use underscores for italics, do not give --- for line breaks, it does not work. The heading should be Latest AI News and then today's date: which is ${new Date()}. Your final output must must contain a minimum of 10 news listings.`,
+    instructions: `You are an AI news reporter. Use the supplied context to generate concise, high-signal news summaries formatted for Google Chat.
+
+Formatting rules:
+- Use *single asterisks* for bold text.
+- Use _underscores_ for italics.
+- Do NOT use **double asterisks**.
+- Do NOT use --- or any horizontal separators.
+- Keep formatting compatible with Google Chat messages.
+
+Output structure:
+
+Start with the heading:
+
+*Latest AI News – ${new Date().toDateString()}*
+
+Then list the news items.
+
+Requirements:
+- Provide a minimum of 10 news items.
+- Each item must be numbered.
+- Each item must contain:
+  1. A clear headline
+  2. The source URL
+  3. A short explanation of why the news matters
+- Keep each summary concise and informative (1–2 sentences).
+
+Format example:
+
+Latest AI News — <Current Date as provided>
+
+1. *Headline of the News*
+<URL>
+_Why it matters:_ Brief explanation of the significance of the news.
+
+2. *Headline of the News*
+<URL>
+_Why it matters:_ Brief explanation of the significance.
+
+Continue the same format for all items.`,
   });
 
   const prompt = `Generate a structured news listing using the following context:\n\n${contextString}`;
