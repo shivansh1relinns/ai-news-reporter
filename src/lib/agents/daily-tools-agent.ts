@@ -5,16 +5,38 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const aiNewsQueries = [
-  "latest artificial intelligence news developments and breakthroughs",
-  "latest AI tools platforms and innovations released recently",
-  "artificial intelligence research papers discoveries and technological advancements",
-  "companies using artificial intelligence new applications and industry use cases",
-  "artificial intelligence startups funding announcements and new products",
-  "major announcements from AI companies and organizations",
-  "artificial intelligence impact on industries jobs and global economy",
-  "new artificial intelligence technologies inventions and systems",
-  "government policies regulations and legal developments related to AI",
-  "emerging trends and future developments in artificial intelligence"
+  "new AI model released benchmark LLM diffusion transformer past 14 days",
+  "OpenAI Anthropic Google Meta Mistral new AI model announcement",
+  "new open source LLM or AI model released GitHub HuggingFace",
+  "new artificial intelligence research paper breakthrough transformer agent architecture",
+  
+  "new AI developer tool SDK API framework launch GitHub AI agents",
+  "new AI coding assistant platform or agent framework released",
+  "AI startup launches developer platform or API for building AI applications",
+
+  "enterprise AI platform launch automation agents for companies",
+  "AI SaaS product launch for business automation or workflow automation",
+  
+  "voice AI agent platform launch speech to speech conversational AI",
+  "AI phone call agent startup launch voice automation platform",
+  "real time voice AI SDK or speech AI API release",
+  "AI call center automation platform voice bot product launch",
+
+  "new AI productivity tool launch for business users management teams",
+  "AI tool for sales automation or AI sales assistant launch",
+  "AI marketing automation platform launch content generation marketing AI",
+  "AI meeting assistant or AI workplace productivity tool launch",
+  "AI tool for customer support automation product launch",
+  "AI CRM assistant or AI sales outreach tool announcement",
+
+  "AI startup funding announcement with product launch AI platform",
+  "startup launches AI tool for businesses or teams",
+
+  "new AI chip GPU accelerator announcement Nvidia AMD AI hardware",
+  "new AI infrastructure or cloud ML platform release",
+
+  "new open source AI framework or agent system GitHub release",
+  "trending GitHub AI repository machine learning or AI agents"
 ];
 
 interface LangSearchWebPage {
