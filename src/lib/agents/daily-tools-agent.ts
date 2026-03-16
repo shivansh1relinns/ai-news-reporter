@@ -39,37 +39,65 @@ const aiNewsQueries = [
   "trending GitHub AI repository machine learning or AI agents"
 ];
 
-interface LangSearchWebPage {
-  name?: string;
+interface FirecrawlSearchItem {
+  title?: string;
   url?: string;
-  displayUrl?: string;
-  summary?: string;
+  description?: string;
+  markdown?: string;
+  content?: string;
   snippet?: string;
 }
 
+interface FirecrawlSearchResponse {
+  success?: boolean;
+  data?: FirecrawlSearchItem[];
+}
+
+const FIRECRAWL_SEARCH_URL = process.env.FIRECRAWL_API_URL || "https://api.firecrawl.dev/v1/search";
+
+function truncate(input: string, maxLength: number) {
+  if (input.length <= maxLength) {
+    return input;
+  }
+
+  return `${input.slice(0, maxLength).trimEnd()}...`;
+}
+
 export async function fetchWebContext(userQuery: string) {
+  const firecrawlApiKey = process.env.FIRECRAWL_API_KEY;
+  if (!firecrawlApiKey) {
+    throw new Error("FIRECRAWL_API_KEY is missing.");
+  }
+
   const webSearchBody = {
     query: userQuery,
-    freshness: "oneDay",
-    summary: false,
-    count: 4
+    limit: 4,
+    scrapeOptions: {
+      formats: ["markdown"],
+      onlyMainContent: true,
+    },
   };
 
-  const response = await axios.post<{ data?: { webPages?: { value?: LangSearchWebPage[] } } }>(`${process.env.LANGSEARCH_API_URL}`, webSearchBody, {
+  const response = await axios.post<FirecrawlSearchResponse>(FIRECRAWL_SEARCH_URL, webSearchBody, {
     headers: {
-      Authorization: `Bearer ${process.env.LANGSEARCH_API_KEY}`,
+      Authorization: `Bearer ${firecrawlApiKey}`,
       "Content-Type": "application/json"
     },
     timeout: 60 * 1000
   });
 
-  const entries = response.data?.data?.webPages?.value ?? [];
+  if (response.data?.success === false) {
+    throw new Error("Firecrawl search request failed.");
+  }
+
+  const entries = response.data?.data ?? [];
 
   return entries
-    .map((entry: LangSearchWebPage) => {
-      const name = entry?.name?.replace(/\s+/g, " ")?.trim() || "Untitled";
-      const url = entry?.url || entry?.displayUrl || "";
-      const summary = entry?.summary || entry?.snippet || "No summary";
+    .map((entry: FirecrawlSearchItem) => {
+      const name = entry?.title?.replace(/\s+/g, " ")?.trim() || "Untitled";
+      const url = entry?.url || "";
+      const rawSummary = entry?.description || entry?.snippet || entry?.content || entry?.markdown || "No summary";
+      const summary = truncate(rawSummary.replace(/\s+/g, " ").trim(), 500);
 
       return `Headline: ${name}\nURL: ${url}\nContent: ${summary}`;
     })
@@ -78,14 +106,26 @@ export async function fetchWebContext(userQuery: string) {
 
 export async function buildContextString() {
   const snippets: string[] = [];
+  const seenUrls = new Set<string>();
 
   for (const query of aiNewsQueries) {
     const entries = await fetchWebContext(query);
     for (const entry of entries) {
+      const urlMatch = entry.match(/URL:\s*(.+)/);
+      const url = urlMatch?.[1]?.trim();
+
+      if (url && seenUrls.has(url)) {
+        continue;
+      }
+
+      if (url) {
+        seenUrls.add(url);
+      }
+
       snippets.push(entry);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 150));
   }
 
   return snippets
